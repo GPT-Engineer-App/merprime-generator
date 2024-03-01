@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Box, Button, Container, Heading, Text, VStack, Code, useToast, Spinner } from "@chakra-ui/react";
+import { Box, Button, Container, Heading, Text, VStack, Code, useToast, Spinner, Input } from "@chakra-ui/react";
 import { FaCalculator } from "react-icons/fa";
 
 // Helper function to check if a number is a Mersenne prime
@@ -13,7 +13,8 @@ const isMersennePrime = (p) => {
 
 const Index = () => {
   const [calculating, setCalculating] = useState(false);
-  const [primeCandidate, setPrimeCandidate] = useState(3);
+  const [inputP, setInputP] = useState("");
+  const [primeCandidate, setPrimeCandidate] = useState(null);
   const [foundPrimes, setFoundPrimes] = useState([]);
   const toast = useToast();
 
@@ -46,7 +47,18 @@ const Index = () => {
   }, [calculating, primeCandidate, toast]);
 
   const startCalculating = () => {
-    setCalculating(true);
+    if (inputP && !isNaN(inputP)) {
+      setPrimeCandidate(parseInt(inputP, 10));
+      setCalculating(true);
+    } else {
+      toast({
+        title: "Invalid Input",
+        description: "Please enter a valid number.",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+    }
   };
 
   const stopCalculating = () => {
@@ -59,15 +71,20 @@ const Index = () => {
         <Heading as="h1" size="xl" textAlign="center">
           Mersenne Prime Generator <FaCalculator />
         </Heading>
-        <Text>This website automatically generates Mersenne primes. Just stay on this page, and primes will be calculated in the background.</Text>
+        <Text>
+          Enter a number to start generating Mersenne primes from 2<sup>p</sup> - 1.
+        </Text>
+        <Input placeholder="Enter a value for p" value={inputP} onChange={(e) => setInputP(e.target.value)} mb={4} />
         {calculating ? (
           <Button colorScheme="red" onClick={stopCalculating}>
             Stop Calculating
           </Button>
         ) : (
-          <Button colorScheme="green" onClick={startCalculating}>
-            Start Calculating
-          </Button>
+          <VStack spacing={3}>
+            <Button colorScheme="green" onClick={startCalculating}>
+              Start Calculating
+            </Button>
+          </VStack>
         )}
         <Box>{calculating ? <Spinner size="xl" /> : <Text>No calculations in progress.</Text>}</Box>
         <Box>
